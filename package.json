@@ -1,0 +1,21 @@
+{
+  "name": "socketpoint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "socketpoint": "./index.js"
+  },
+  "scripts": {
+    "preinstall": "localdev uninstall sockettools inputtools",
+    "postinstall": "localdev install sockettools inputtools",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TerraZero",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^5.0.0",
+    "socket.io": "^2.3.0",
+    "uuid": "^7.0.3"
+  }
+}
