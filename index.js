@@ -11,6 +11,9 @@ const Client = require('socket.io-client');
 program
   .arguments('<url>')
   .action(async (url) => {
+    const server = new Server();
+    const socket = server.createClient(Client(url), 'cli', false);
+
     const logger = new Logger('socketpoint');
     const form = new Form(logger);
 
@@ -27,20 +30,25 @@ program
       DeepData.setDeep(params, key, value);
     }
 
-    const server = new Server();
-    const socket = server.createClient(Client(url), 'cli', false);
-
     logger.underline('Request:');
     logger.log(form.values.route);
     logger.data(params);
-    const response = await socket.request(form.values.route, params);
-    logger.underline('Response:');
-    if (response.isError()) {
-      logger.error(response.status + ' - ' + Status.extract(response.status).join(' | '));
+    let response = null;
+    if (form.values.route === 'debug' && params.event) {
+      socket.trigger(params.event, params.params);
     } else {
-      logger.log(response.status + ' - ' + Status.extract(response.status).join(' | '));
+      response = await socket.request(form.values.route, params);
     }
-    logger.data(response.data);
+
+    if (response) {
+      logger.underline('Response:');
+      if (response.isError()) {
+        logger.error(response.status + ' - ' + Status.extract(response.status).join(' | '));
+      } else {
+        logger.log(response.status + ' - ' + Status.extract(response.status).join(' | '));
+      }
+      logger.data(response.data);
+    }
 
     socket.realsocket.disconnect(true);
   })
